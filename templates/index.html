@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Virtual Assistant - Draxx</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color:rgb(15, 6, 26);
+      background-image: url("/static/maingif.gif");
+    
+      background-size: cover;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .container {
+      padding: 40px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #00f0ff, #ff0077);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 1.2em;
+      color: #ccc;
+    }
+
+    .chat-box {
+      margin-top: 30px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      background-color: #1a1a2e;
+    }
+
+    .message {
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .message.user {
+      color: #00f0ff;
+    }
+
+    .message.bot {
+      color: #ff0077;
+    }
+
+    .waveform {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      height: 80px;
+      margin: 30px 0;
+    }
+    .logo{
+      height: 200px;
+      width: 300px;
+      margin-top: 40px;
+    }
+
+    .bar {
+      width: 6px;
+      height: 20px;
+      background: linear-gradient(to top, #00f0ff, #ff0077);
+      margin: 0 3px;
+      animation: wave 1.2s infinite ease-in-out;
+      border-radius: 2px;
+    }
+
+    .bar:nth-child(1) { animation-delay: 0s; }
+    .bar:nth-child(2) { animation-delay: 0.1s; }
+    .bar:nth-child(3) { animation-delay: 0.2s; }
+    .bar:nth-child(4) { animation-delay: 0.3s; }
+    .bar:nth-child(5) { animation-delay: 0.4s; }
+    .bar:nth-child(6) { animation-delay: 0.5s; }
+    .bar:nth-child(7) { animation-delay: 0.6s; }
+    .bar:nth-child(8) { animation-delay: 0.7s; }
+
+    @keyframes wave {
+      0%, 100% { height: 20px; }
+      50% { height: 60px; }
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="\static\log.jpg"  class="logo" alt="Voice Assistant Logo" width="100" />
+    <h1>Draxx</h1>
+    <div class="status" id="status">Initializing Draxx...</div>
+
+    <div class="waveform" id="waveform">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+
+    <div class="chat-box" id="chatBox"></div>
+  </div>
+
+  <script>
+    async function startAssistant() {
+      const status = document.getElementById("status");
+      const chatBox = document.getElementById("chatBox");
+      const waveform = document.getElementById("waveform");
+
+      try {
+        status.textContent = "Recognizing...";
+        waveform.style.display = "flex";
+
+        const response = await fetch('/listen'); // API call to backend
+        const data = await response.json();
+
+        const userMessage = document.createElement("div");
+        userMessage.className = "message user";
+        userMessage.textContent = "🎤 You: " + data.user;
+
+        const aiMessage = document.createElement("div");
+        aiMessage.className = "message bot";
+        aiMessage.textContent = "🤖 Draxx: " + data.response;
+
+        chatBox.appendChild(userMessage);
+        chatBox.appendChild(aiMessage);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        status.textContent = "Waiting for next command...";
+        waveform.style.display = "none";
+
+        setTimeout(startAssistant, 1000); // Restart listening
+      } catch (error) {
+        status.textContent = "⚠️ Error occurred. Restarting...";
+        waveform.style.display = "none";
+        setTimeout(startAssistant, 2000);
+      }
+    }
+
+    window.onload = () => {
+      startAssistant();
+    };
+  </script>
+</body>
+</html>
